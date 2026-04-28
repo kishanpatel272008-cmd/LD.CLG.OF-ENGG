@@ -1,960 +1,463 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UniSphere – LD College Portal</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UniSphere – LD College Portal</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 
-  <style>
-    :root {
-      --blue: #2563eb;
-      --indigo: #4f46e5;
-      --purple: #7c3aed;
-      --emerald: #059669;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: #0f172a;
-      color: #1e293b;
-      min-height: 100vh;
-    }
-
-    .serif { font-family: 'Instrument Serif', serif; }
-
-    /* ─── ANIMATED BG ─── */
-    .auth-bg {
-      background: #0f172a;
-      position: relative;
-      overflow: hidden;
-    }
-    .auth-bg::before {
-      content: '';
-      position: absolute;
-      width: 800px; height: 800px;
-      background: radial-gradient(circle, rgba(99,102,241,0.25) 0%, transparent 70%);
-      top: -200px; left: -200px;
-      animation: drift 12s ease-in-out infinite alternate;
-    }
-    .auth-bg::after {
-      content: '';
-      position: absolute;
-      width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(124,58,237,0.2) 0%, transparent 70%);
-      bottom: -150px; right: -150px;
-      animation: drift 9s ease-in-out infinite alternate-reverse;
-    }
-    @keyframes drift {
-      from { transform: translate(0,0) scale(1); }
-      to   { transform: translate(60px,40px) scale(1.08); }
-    }
-
-    /* ─── CARD ─── */
-    .glass-card {
-      background: rgba(255,255,255,0.98);
-      border-radius: 28px;
-      box-shadow: 0 32px 80px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.1);
-      position: relative;
-      z-index: 10;
-    }
-
-    /* ─── TABS ─── */
-    .tab-active {
-      background: #2563eb;
-      color: #fff;
-      border-radius: 12px;
-    }
-
-    /* ─── INPUTS ─── */
-    .field {
-      width: 100%;
-      padding: 14px 18px;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 14px;
-      font-size: 15px;
-      font-family: 'DM Sans', sans-serif;
-      transition: border-color .2s, box-shadow .2s;
-      background: #f8fafc;
-      color: #0f172a;
-      outline: none;
-    }
-    .field:focus {
-      border-color: #2563eb;
-      box-shadow: 0 0 0 4px rgba(37,99,235,0.12);
-      background: #fff;
-    }
-    .field.error { border-color: #ef4444; box-shadow: 0 0 0 4px rgba(239,68,68,0.1); }
-
-    /* ─── BUTTONS ─── */
-    .btn-primary {
-      width: 100%;
-      padding: 15px;
-      background: linear-gradient(135deg, #2563eb, #4f46e5);
-      color: #fff;
-      border: none;
-      border-radius: 14px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity .2s, transform .1s;
-      font-family: 'DM Sans', sans-serif;
-    }
-    .btn-primary:hover { opacity: .92; }
-    .btn-primary:active { transform: scale(.98); }
-    .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
-
-    .btn-secondary {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, #059669, #0891b2);
-      color: #fff;
-      border: none;
-      border-radius: 14px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity .2s;
-      font-family: 'DM Sans', sans-serif;
-    }
-    .btn-secondary:hover { opacity: .92; }
-
-    /* ─── TOASTS ─── */
-    #toast {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 9999;
-      padding: 14px 22px;
-      border-radius: 14px;
-      font-size: 14px;
-      font-weight: 500;
-      opacity: 0;
-      transform: translateY(-10px);
-      transition: all .3s;
-      pointer-events: none;
-      max-width: 320px;
-    }
-    #toast.show { opacity: 1; transform: translateY(0); }
-    #toast.success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
-    #toast.error   { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
-    #toast.info    { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
-
-    /* ─── DASHBOARD ─── */
-    .dash-bg { background: #f1f5f9; min-height: 100vh; }
-    .dash-nav {
-      background: #fff;
-      border-bottom: 1px solid #e2e8f0;
-      padding: 16px 32px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky; top: 0; z-index: 50;
-    }
-    .stat-card {
-      background: #fff;
-      border-radius: 20px;
-      padding: 28px;
-      transition: transform .25s, box-shadow .25s;
-    }
-    .stat-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,.09); }
-
-    /* ─── ROLE SELECTOR ─── */
-    .role-card {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 18px 8px;
-      border: 2px solid #e2e8f0;
-      border-radius: 16px;
-      cursor: pointer;
-      transition: all .2s;
-      background: #fff;
-      font-family: 'DM Sans', sans-serif;
-    }
-    .role-card.selected {
-      border-color: #2563eb;
-      background: #eff6ff;
-    }
-    .role-card:hover { border-color: #93c5fd; background: #f8fafc; }
-
-    /* ─── LOADER ─── */
-    .spinner {
-      display: inline-block;
-      width: 18px; height: 18px;
-      border: 2.5px solid rgba(255,255,255,.4);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-      vertical-align: middle;
-      margin-right: 8px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ─── SUBJECTS TABLE ─── */
-    .subject-row:hover { background: #f8fafc; }
-    .grade-badge {
-      display: inline-block;
-      padding: 3px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    /* ─── FORGOT PASSWORD ─── */
-    #forgotSection { display: none; }
-
-    /* ─── SLIDE ANIMATION ─── */
-    .slide-in {
-      animation: slideIn .35s cubic-bezier(.4,0,.2,1) forwards;
-    }
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ─── MOBILE ─── */
-    @media (max-width: 640px) {
-      .glass-card { border-radius: 20px; margin: 12px; }
-      .dash-nav { padding: 12px 16px; }
-    }
-
-    /* ─── FIREBASE NOTICE BANNER ─── */
-    .setup-banner {
-      background: linear-gradient(135deg, #fef3c7, #fde68a);
-      border: 1px solid #f59e0b;
-      border-radius: 14px;
-      padding: 16px;
-      font-size: 13px;
-      color: #78350f;
-      line-height: 1.6;
-    }
-    .setup-banner code {
-      background: rgba(0,0,0,.08);
-      border-radius: 4px;
-      padding: 1px 5px;
-      font-family: monospace;
-      font-size: 12px;
-    }
-  </style>
+<style>
+  body { font-family: 'DM Sans', sans-serif; background: #0a1628; color: #f1f5f9; min-height: 100vh; margin: 0; }
+  .syne { font-family: 'Syne', sans-serif; }
+  
+  .auth-card {
+    background: linear-gradient(145deg, #0d1b2e, #0a1628);
+    border: 1px solid rgba(99,102,241,0.3);
+    border-radius: 28px;
+    max-width: 480px;
+    width: 100%;
+  }
+  .field {
+    width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.06);
+    border: 1.5px solid rgba(255,255,255,0.12); border-radius: 12px;
+    color: #f1f5f9; outline: none;
+  }
+  .field:focus { border-color: #6366f1; background: rgba(255,255,255,0.1); }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, #2563eb, #4338ca);
+    color: white; padding: 14px; border-radius: 13px; font-weight: 600; width: 100%;
+    transition: all 0.2s;
+  }
+  .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
+  .role-card.selected { border-color: #6366f1; background: rgba(99,102,241,0.2); }
+  
+  #toast {
+    position: fixed; top: 20px; right: 20px; padding: 14px 20px; border-radius: 14px;
+    z-index: 9999; opacity: 0; transition: all 0.3s; transform: translateX(100%);
+  }
+  #toast.show { opacity: 1; transform: translateX(0); }
+  
+  /* Logout button - ultra specific */
+  nav button[onclick="doLogout()"] {
+    color: #f87171 !important; background: rgba(248,113,113,0.2) !important;
+    border: 2px solid rgba(248,113,113,0.4) !important; font-weight: 600 !important;
+    padding: 12px 24px !important; border-radius: 12px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+  nav button[onclick="doLogout()"]:hover {
+    background: rgba(239,68,68,0.3) !important; border-color: #ef4444 !important;
+    color: white !important; transform: translateY(-2px) !important; box-shadow: 0 10px 25px rgba(239,68,68,0.3) !important;
+  }
+</style>
 </head>
 <body>
 
-<!-- ───────────────────── TOAST ───────────────────── -->
 <div id="toast"></div>
 
-<!-- ═══════════════════════════════════════════════════
-     AUTH PAGE
-═══════════════════════════════════════════════════ -->
-<div id="authPage" class="auth-bg min-h-screen flex items-center justify-center p-4">
-  <div class="glass-card w-full max-w-md slide-in">
-
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-t-[26px] p-8 text-center text-white">
-      <div class="text-6xl mb-3">🎓</div>
-      <h1 class="text-3xl font-bold serif">UniSphere</h1>
-      <p class="text-blue-100 mt-1 text-sm">LD College of Engineering Portal</p>
+<!-- AUTH PAGE -->
+<div id="authPage" class="min-h-screen flex items-center justify-center p-4">
+  <div class="auth-card p-8">
+    <div class="text-center mb-8">
+      <div class="text-5xl mb-4">🎓</div>
+      <h1 class="syne text-3xl font-bold">UniSphere</h1>
+      <p class="text-slate-400">LD College of Engineering Portal</p>
     </div>
 
-    <div class="p-7">
+    <!-- Role Selector -->
+    <div class="flex gap-3 mb-6">
+      <button onclick="selectRole('student')" id="roleStudent" class="role-card selected flex-1 py-4 rounded-2xl border-2 border-transparent flex flex-col items-center">
+        <i class="fas fa-user-graduate text-2xl mb-1"></i><span class="text-sm">Student</span>
+      </button>
+      <button onclick="selectRole('faculty')" id="roleFaculty" class="role-card flex-1 py-4 rounded-2xl border-2 border-transparent flex flex-col items-center">
+        <i class="fas fa-chalkboard-teacher text-2xl mb-1 text-emerald-400"></i><span class="text-sm">Faculty</span>
+      </button>
+      <button onclick="selectRole('admin')" id="roleAdmin" class="role-card flex-1 py-4 rounded-2xl border-2 border-transparent flex flex-col items-center">
+        <i class="fas fa-shield-alt text-2xl mb-1 text-purple-400"></i><span class="text-sm">Admin</span>
+      </button>
+    </div>
 
-      <!-- Firebase Setup Banner (shown until configured) -->
-      <div class="setup-banner mb-6" id="setupBanner">
-        <strong>⚙️ Setup Required</strong><br>
-        To enable cross-device login, add your Firebase config below.<br>
-        <a href="#" onclick="showSetup()" class="underline font-semibold">Click here to configure Firebase →</a>
+    <!-- Tabs -->
+    <div class="flex bg-slate-800 rounded-2xl p-1 mb-6">
+      <button onclick="switchTab('login')" id="tabLogin" class="flex-1 py-3 rounded-xl font-medium bg-white/10">Login</button>
+      <button onclick="switchTab('signup')" id="tabSignup" class="flex-1 py-3 rounded-xl font-medium">Sign Up</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="loginForm">
+      <div class="mb-4">
+        <label class="text-xs font-semibold text-slate-400 block mb-2" id="loginIdLabel">Student ID</label>
+        <input id="loginId" class="field" placeholder="e.g. FAC001 or ADM001 or 2023BCS045">
       </div>
-
-      <!-- Role Selector -->
-      <div class="flex gap-3 mb-6">
-        <button class="role-card selected" id="roleStudent" onclick="selectRole('student')">
-          <i class="fas fa-user-graduate text-2xl text-blue-600 mb-1"></i>
-          <span class="text-sm font-semibold">Student</span>
-        </button>
-        <button class="role-card" id="roleFaculty" onclick="selectRole('faculty')">
-          <i class="fas fa-chalkboard-teacher text-2xl text-emerald-600 mb-1"></i>
-          <span class="text-sm font-semibold">Faculty</span>
-        </button>
-        <button class="role-card" id="roleAdmin" onclick="selectRole('admin')">
-          <i class="fas fa-shield-alt text-2xl text-purple-600 mb-1"></i>
-          <span class="text-sm font-semibold">Admin</span>
-        </button>
-      </div>
-
-      <!-- TAB SWITCHER -->
-      <div class="flex bg-slate-100 rounded-[16px] p-1 mb-6">
-        <button id="tabLogin" onclick="switchTab('login')"
-          class="flex-1 py-2.5 text-sm font-semibold transition-all tab-active">
-          Login
-        </button>
-        <button id="tabSignup" onclick="switchTab('signup')"
-          class="flex-1 py-2.5 text-sm font-semibold text-gray-500 transition-all">
-          Sign Up
+      <div class="relative mb-6">
+        <label class="text-xs font-semibold text-slate-400 block mb-2">Password</label>
+        <input id="loginPass" type="password" class="field w-full" placeholder="Enter password" onkeydown="if(event.key==='Enter') doLogin()">
+        <button onclick="togglePassword('loginPass','eyeL')" class="absolute right-4 top-10 text-slate-400 hover:text-white">
+          <i id="eyeL" class="fas fa-eye"></i>
         </button>
       </div>
+      <button onclick="doLogin()" id="loginBtn" class="btn-primary">Login →</button>
+      <div id="demoHint" class="text-center text-xs mt-4 text-slate-400"></div>
+    </div>
 
-      <!-- ─── LOGIN FORM ─── -->
-      <div id="loginForm" class="space-y-4">
-        <div>
-          <label class="text-sm font-medium text-gray-700 block mb-1.5" id="loginIdLabel">Student ID</label>
-          <input id="loginId" class="field" type="text" placeholder="e.g. 2023BCS045">
-        </div>
-        <div class="relative">
-          <label class="text-sm font-medium text-gray-700 block mb-1.5">Password</label>
-          <input id="loginPass" class="field pr-12" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
-          <button type="button" onclick="toggleVis('loginPass','eyeLogin')" class="absolute right-4 top-[42px] text-gray-400 hover:text-gray-600">
-            <i id="eyeLogin" class="fas fa-eye"></i>
-          </button>
-        </div>
-        <div class="flex justify-end">
-          <button onclick="showForgot()" class="text-sm text-blue-600 hover:underline">Forgot password?</button>
-        </div>
-        <button class="btn-primary" id="loginBtn" onclick="doLogin()">Login →</button>
+    <!-- SIGNUP FORM -->
+    <div id="signupForm" class="hidden space-y-4">
+      <input id="signupName" class="field" placeholder="Full Name *">
+      <input id="signupId" class="field" placeholder="ID *">
+      <input id="signupEmail" class="field" type="email" placeholder="Email">
+      
+      <!-- NEW: JOIN DATE FIELD -->
+      <div>
+        <label class="text-xs font-semibold text-slate-400 block mb-2">Join Date *</label>
+        <input id="signupJoinDate" type="date" class="field" max="">
       </div>
-
-      <!-- ─── FORGOT PASSWORD ─── -->
-      <div id="forgotForm" class="hidden space-y-4">
-        <div class="text-center mb-2">
-          <p class="text-gray-600 text-sm">Enter your registered email to receive a reset link.</p>
-        </div>
-        <div>
-          <label class="text-sm font-medium text-gray-700 block mb-1.5">Registered Email</label>
-          <input id="resetEmail" class="field" type="email" placeholder="you@example.com">
-        </div>
-        <button class="btn-primary" onclick="doForgotPassword()">Send Reset Link</button>
-        <button onclick="showLogin()" class="w-full text-center text-sm text-blue-600 hover:underline mt-1">← Back to Login</button>
-      </div>
-
-      <!-- ─── SIGNUP FORM ─── -->
-      <div id="signupForm" class="hidden space-y-4">
-        <div>
-          <label class="text-sm font-medium text-gray-700 block mb-1.5">Full Name</label>
-          <input id="signupName" class="field" type="text" placeholder="Dhaval Patel">
-        </div>
-        <div>
-          <label class="text-sm font-medium text-gray-700 block mb-1.5">Student ID</label>
-          <input id="signupId" class="field" type="text" placeholder="e.g. 2026BCS001">
-        </div>
-        <div>
-          <label class="text-sm font-medium text-gray-700 block mb-1.5">Email</label>
-          <input id="signupEmail" class="field" type="email" placeholder="you@ldce.ac.in">
-        </div>
-        <div>
-          <label class="text-sm font-medium text-gray-700 block mb-1.5">College</label>
-          <select id="signupCollege" class="field">
-            <option value="LD College of Engineering">LD College of Engineering</option>
-            <option value="Ahmedabad University">Ahmedabad University</option>
-            <option value="Nirma University">Nirma University</option>
-            <option value="GTU Affiliate College">GTU Affiliate College</option>
-          </select>
-        </div>
-        <div>
-          <label class="text-sm font-medium text-gray-700 block mb-1.5">Course</label>
-          <select id="signupCourse" class="field">
-            <option value="B.Tech Computer Engineering">B.Tech Computer Engineering</option>
-            <option value="B.Tech IT">B.Tech Information Technology</option>
-            <option value="B.Tech Mechanical">B.Tech Mechanical Engineering</option>
-            <option value="B.Tech Civil">B.Tech Civil Engineering</option>
-            <option value="B.Tech Electronics">B.Tech Electronics & Communication</option>
-          </select>
-        </div>
-        <div class="relative">
-          <label class="text-sm font-medium text-gray-700 block mb-1.5">Password</label>
-          <input id="signupPass" class="field pr-12" type="password" placeholder="Min. 6 characters">
-          <button type="button" onclick="toggleVis('signupPass','eyeSignup')" class="absolute right-4 top-[42px] text-gray-400 hover:text-gray-600">
-            <i id="eyeSignup" class="fas fa-eye"></i>
-          </button>
-        </div>
-        <div>
-          <label class="text-sm font-medium text-gray-700 block mb-1.5">Confirm Password</label>
-          <input id="signupConfirm" class="field" type="password" placeholder="Re-enter password" onkeydown="if(event.key==='Enter')doSignup()">
-        </div>
-        <button class="btn-primary" id="signupBtn" onclick="doSignup()">Create Account →</button>
-      </div>
-
+      
+      <div id="signupExtraFields"></div>
+      
+      <input id="signupPass" type="password" class="field" placeholder="Password *">
+      <input id="signupConfirm" type="password" class="field" placeholder="Confirm Password *" onkeydown="if(event.key==='Enter') doSignup()">
+      
+      <button onclick="doSignup()" class="btn-primary">Create Account →</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════
-     FIREBASE SETUP MODAL
-═══════════════════════════════════════════════════ -->
-<div id="setupModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-  <div class="bg-white rounded-3xl w-full max-w-lg p-8 max-h-[90vh] overflow-y-auto">
-    <div class="flex justify-between items-start mb-6">
-      <h2 class="text-xl font-bold">🔥 Firebase Configuration</h2>
-      <button onclick="hideSetup()" class="text-3xl text-gray-400 hover:text-gray-600 leading-none">×</button>
-    </div>
-
-    <div class="space-y-3 text-sm text-gray-700 mb-6 bg-blue-50 p-4 rounded-2xl">
-      <p class="font-semibold text-blue-800">📋 Steps to get your Firebase config:</p>
-      <ol class="list-decimal ml-4 space-y-1.5">
-        <li>Go to <a href="https://console.firebase.google.com" target="_blank" class="text-blue-600 underline">console.firebase.google.com</a></li>
-        <li>Create a new project (or select existing)</li>
-        <li>Click ⚙️ → Project Settings → General tab</li>
-        <li>Under "Your apps", click <strong>Web</strong> (<code>&lt;/&gt;</code>)</li>
-        <li>Register app, then copy the <code>firebaseConfig</code> object</li>
-        <li>In Firebase console, enable <strong>Authentication → Email/Password</strong></li>
-        <li>In <strong>Firestore Database</strong>, create a database (start in test mode)</li>
-      </ol>
-    </div>
-
-    <div class="space-y-3">
-      <div>
-        <label class="text-sm font-medium text-gray-700 block mb-1">API Key</label>
-        <input id="cfgApiKey" class="field" placeholder="AIzaSy...">
+<!-- DASHBOARD -->
+<div id="dashboard" class="hidden min-h-screen bg-[#0a1628]">
+  <nav class="bg-[#0f1f3d] p-5 border-b border-white/10">
+    <div class="max-w-6xl mx-auto flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <span class="text-3xl">🎓</span>
+        <div>
+          <h1 class="syne text-2xl font-bold">UniSphere</h1>
+          <p class="text-xs text-slate-400" id="navCollege">LD College of Engineering</p>
+        </div>
       </div>
-      <div>
-        <label class="text-sm font-medium text-gray-700 block mb-1">Auth Domain</label>
-        <input id="cfgAuthDomain" class="field" placeholder="your-project.firebaseapp.com">
-      </div>
-      <div>
-        <label class="text-sm font-medium text-gray-700 block mb-1">Project ID</label>
-        <input id="cfgProjectId" class="field" placeholder="your-project-id">
-      </div>
-      <div>
-        <label class="text-sm font-medium text-gray-700 block mb-1">Storage Bucket</label>
-        <input id="cfgStorageBucket" class="field" placeholder="your-project.appspot.com">
-      </div>
-      <div>
-        <label class="text-sm font-medium text-gray-700 block mb-1">Messaging Sender ID</label>
-        <input id="cfgSenderId" class="field" placeholder="123456789">
-      </div>
-      <div>
-        <label class="text-sm font-medium text-gray-700 block mb-1">App ID</label>
-        <input id="cfgAppId" class="field" placeholder="1:123456789:web:abc...">
-      </div>
-    </div>
-
-    <button onclick="saveFirebaseConfig()" class="btn-primary mt-6">
-      Save & Connect to Firebase
-    </button>
-
-    <p class="text-xs text-gray-400 text-center mt-4">
-      Your config is saved locally in your browser. Without Firebase, the app falls back to local storage (single-device only).
-    </p>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════
-     DASHBOARD
-═══════════════════════════════════════════════════ -->
-<div id="dashboard" class="hidden dash-bg">
-
-  <!-- Nav -->
-  <nav class="dash-nav">
-    <div class="flex items-center gap-3">
-      <span class="text-3xl">🎓</span>
-      <div>
-        <h1 class="font-bold text-xl text-gray-900 leading-tight">UniSphere</h1>
-        <p class="text-xs text-gray-400" id="navCollege">LD College of Engineering</p>
-      </div>
-    </div>
-    <div class="flex items-center gap-4">
-      <div class="text-right hidden sm:block">
-        <p id="navName" class="font-semibold text-gray-800"></p>
-        <p id="navId" class="text-xs text-gray-400"></p>
-      </div>
-      <button onclick="doLogout()"
-        class="flex items-center gap-2 px-4 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-sm font-semibold transition">
+      <button onclick="doLogout()" class="flex items-center gap-2">
         <i class="fas fa-sign-out-alt"></i>
-        <span class="hidden sm:inline">Logout</span>
+        <span>Logout</span>
       </button>
     </div>
   </nav>
 
-  <!-- Content -->
-  <div class="max-w-6xl mx-auto p-4 lg:p-8" id="dashContent"></div>
+  <div id="dashContent" class="max-w-6xl mx-auto p-6 min-h-[70vh]"></div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════
-     SCRIPTS
-═══════════════════════════════════════════════════ -->
-
-<!-- Firebase SDK v9 (compat mode) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
 <script>
-// ════════════════════════════════════════════
-//  STATE
-// ════════════════════════════════════════════
+// ==================== STATE ====================
 let currentRole = 'student';
-let firebaseReady = false;
-let auth = null, db = null;
+let currentUser = null;
 
-const firstYearSubjects = [
-  { name: "Mathematics – I",                  internal: 28, external: 62, total: 90, grade: "A"  },
-  { name: "Physics",                           internal: 25, external: 58, total: 83, grade: "B+" },
-  { name: "Basic Electrical Engineering",      internal: 30, external: 65, total: 95, grade: "A+" },
-  { name: "Engineering Graphics & Design",     internal: 27, external: 60, total: 87, grade: "A"  },
-  { name: "Communication Skills",              internal: 22, external: 55, total: 77, grade: "B"  },
-  { name: "Programming for Problem Solving",   internal: 29, external: 61, total: 90, grade: "A+" }
-];
+const CLASS_STUDENT_COUNT = { "CE-2A": 68, "CE-3A": 72, "CE-4A": 65, "CE-4B": 70 };
 
-// ════════════════════════════════════════════
-//  FIREBASE INIT
-// ════════════════════════════════════════════
-function tryInitFirebase(cfg) {
-  try {
-    if (!firebase.apps.length) {
-      firebase.initializeApp(cfg);
-    }
-    auth = firebase.auth();
-    db   = firebase.firestore();
-    firebaseReady = true;
-    document.getElementById('setupBanner').innerHTML =
-      '<strong>✅ Firebase Connected!</strong> Cross-device login is active. <a href="#" onclick="showSetup()" class="underline">Reconfigure</a>';
-    document.getElementById('setupBanner').style.background = '#ecfdf5';
-    document.getElementById('setupBanner').style.borderColor = '#6ee7b7';
-    document.getElementById('setupBanner').style.color = '#065f46';
-    showToast('Firebase connected!', 'success');
-  } catch (e) {
-    firebaseReady = false;
-  }
+// Format join date
+function formatJoinDate(dateString) {
+  if (!dateString) return 'Not specified';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-IN', { 
+    year: 'numeric', month: 'long', day: 'numeric' 
+  });
 }
 
-function loadSavedConfig() {
-  try {
-    const cfg = JSON.parse(localStorage.getItem('unisphere_firebase_cfg'));
-    if (cfg && cfg.apiKey) tryInitFirebase(cfg);
-  } catch(e) {}
-}
-
-// ════════════════════════════════════════════
-//  SETUP MODAL
-// ════════════════════════════════════════════
-function showSetup() {
-  try {
-    const cfg = JSON.parse(localStorage.getItem('unisphere_firebase_cfg')) || {};
-    document.getElementById('cfgApiKey').value        = cfg.apiKey        || '';
-    document.getElementById('cfgAuthDomain').value    = cfg.authDomain    || '';
-    document.getElementById('cfgProjectId').value     = cfg.projectId     || '';
-    document.getElementById('cfgStorageBucket').value = cfg.storageBucket || '';
-    document.getElementById('cfgSenderId').value      = cfg.messagingSenderId || '';
-    document.getElementById('cfgAppId').value         = cfg.appId         || '';
-  } catch(e) {}
-  document.getElementById('setupModal').classList.remove('hidden');
-}
-
-function hideSetup() {
-  document.getElementById('setupModal').classList.add('hidden');
-}
-
-function saveFirebaseConfig() {
-  const cfg = {
-    apiKey:            document.getElementById('cfgApiKey').value.trim(),
-    authDomain:        document.getElementById('cfgAuthDomain').value.trim(),
-    projectId:         document.getElementById('cfgProjectId').value.trim(),
-    storageBucket:     document.getElementById('cfgStorageBucket').value.trim(),
-    messagingSenderId: document.getElementById('cfgSenderId').value.trim(),
-    appId:             document.getElementById('cfgAppId').value.trim()
-  };
-  if (!cfg.apiKey || !cfg.projectId) {
-    showToast('Please fill in at least API Key and Project ID', 'error');
-    return;
-  }
-  localStorage.setItem('unisphere_firebase_cfg', JSON.stringify(cfg));
-  tryInitFirebase(cfg);
-  hideSetup();
-}
-
-// ════════════════════════════════════════════
-//  UI HELPERS
-// ════════════════════════════════════════════
-function showToast(msg, type = 'info') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = `show ${type}`;
-  t.style.display = 'block';
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => { t.classList.remove('show'); }, 3200);
-}
-
-function toggleVis(inputId, iconId) {
-  const inp = document.getElementById(inputId);
-  const ico = document.getElementById(iconId);
-  if (inp.type === 'password') {
-    inp.type = 'text';
-    ico.classList.replace('fa-eye','fa-eye-slash');
-  } else {
-    inp.type = 'password';
-    ico.classList.replace('fa-eye-slash','fa-eye');
-  }
-}
-
+// ==================== UI FUNCTIONS ====================
 function selectRole(role) {
   currentRole = role;
-  ['student','faculty','admin'].forEach(r => {
-    document.getElementById('role'+r.charAt(0).toUpperCase()+r.slice(1)).classList.toggle('selected', r===role);
+  ['roleStudent', 'roleFaculty', 'roleAdmin'].forEach(id => {
+    document.getElementById(id).classList.toggle('selected', currentRole === id.replace('role', '').toLowerCase());
   });
-  const labels = { student: 'Student ID', faculty: 'Faculty ID', admin: 'Admin ID' };
-  document.getElementById('loginIdLabel').textContent = labels[role];
+
+  document.getElementById('loginIdLabel').textContent = 
+    role === 'student' ? 'Student ID' : role === 'faculty' ? 'Faculty ID' : 'Admin ID';
+
+  document.getElementById('demoHint').innerHTML = 
+    role === 'faculty' ? `Demo: <strong>FAC001</strong> / <strong>faculty123</strong>` :
+    role === 'admin' ? `Demo: <strong>ADM001</strong> / <strong>admin123</strong>` :
+    `Demo: <strong>2023BCS045</strong> / <strong>student123</strong>`;
+
+  renderSignupExtraFields();
+  setMaxJoinDate();
+}
+
+function setMaxJoinDate() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('signupJoinDate').max = today;
+  document.getElementById('signupJoinDate').value = today; // Default to today
+}
+
+function renderSignupExtraFields() {
+  const container = document.getElementById('signupExtraFields');
+  if (currentRole === 'faculty') {
+    container.innerHTML = `
+      <input id="signupDept" class="field" value="Computer Engineering" placeholder="Department">
+      <input id="signupDesig" class="field" value="Professor" placeholder="Designation">
+      <input id="signupExperience" type="number" class="field" value="8" placeholder="Experience (years)" min="0">
+      <input id="signupCabin" class="field" value="CS-305" placeholder="Cabin No.">
+      <input id="signupSubjects" class="field" value="Data Structures, Algorithms" placeholder="Subjects (comma separated)">
+      <input id="signupClasses" class="field" value="CE-2A, CE-3A" placeholder="Classes (comma separated)">
+    `;
+  } else if (currentRole === 'admin') {
+    container.innerHTML = `<input id="signupAdminRole" class="field" value="Super Admin" placeholder="Admin Role">`;
+  } else {
+    container.innerHTML = `<input id="signupCourse" class="field" value="B.Tech Computer Engineering" placeholder="Course">`;
+  }
 }
 
 function switchTab(tab) {
-  const isLogin = tab === 'login';
-  document.getElementById('loginForm').classList.toggle('hidden', !isLogin);
-  document.getElementById('signupForm').classList.toggle('hidden', isLogin);
-  document.getElementById('forgotForm').classList.add('hidden');
-  document.getElementById('tabLogin').classList.toggle('tab-active', isLogin);
-  document.getElementById('tabSignup').classList.toggle('tab-active', !isLogin);
-  document.getElementById('tabLogin').classList.toggle('text-gray-500', !isLogin);
-  document.getElementById('tabSignup').classList.toggle('text-gray-500', isLogin);
+  document.getElementById('loginForm').classList.toggle('hidden', tab !== 'login');
+  document.getElementById('signupForm').classList.toggle('hidden', tab !== 'signup');
 }
 
-function showForgot() {
-  document.getElementById('loginForm').classList.add('hidden');
-  document.getElementById('forgotForm').classList.remove('hidden');
+function togglePassword(id, iconId) {
+  const input = document.getElementById(id);
+  const icon = document.getElementById(iconId);
+  input.type = input.type === 'password' ? 'text' : 'password';
+  icon.classList.toggle('fa-eye');
+  icon.classList.toggle('fa-eye-slash');
 }
 
-function showLogin() {
-  document.getElementById('forgotForm').classList.add('hidden');
-  document.getElementById('loginForm').classList.remove('hidden');
+function showToast(msg, type = 'info') {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = `show bg-emerald-600/95 backdrop-blur-lg border border-emerald-400/50 shadow-2xl ${type === 'error' ? 'bg-red-600/95 border-red-400/50' : ''}`;
+  setTimeout(() => toast.classList.remove('show'), 4000);
 }
 
-function setLoading(btnId, loading, label='Login →') {
-  const btn = document.getElementById(btnId);
-  btn.disabled = loading;
-  btn.innerHTML = loading
-    ? `<span class="spinner"></span> Please wait...`
-    : label;
-}
-
-// ════════════════════════════════════════════
-//  LOCAL STORAGE FALLBACK DB
-// ════════════════════════════════════════════
-const LOCAL_KEY = 'unisphere_local_users';
-
-function getLocalUsers() {
-  try { return JSON.parse(localStorage.getItem(LOCAL_KEY)) || []; } catch { return []; }
-}
-function saveLocalUser(user) {
-  const users = getLocalUsers();
-  const idx = users.findIndex(u => u.studentId === user.studentId);
-  if (idx >= 0) users[idx] = user;
-  else users.push(user);
-  localStorage.setItem(LOCAL_KEY, JSON.stringify(users));
-}
-function findLocalUser(email, password) {
-  return getLocalUsers().find(u => u.email === email && u.password === password) || null;
-}
-
-// ════════════════════════════════════════════
-//  SIGNUP
-// ════════════════════════════════════════════
-async function doSignup() {
-  const name    = document.getElementById('signupName').value.trim();
-  const sid     = document.getElementById('signupId').value.trim();
-  const email   = document.getElementById('signupEmail').value.trim();
-  const college = document.getElementById('signupCollege').value;
-  const course  = document.getElementById('signupCourse').value;
-  const pass    = document.getElementById('signupPass').value;
+// ==================== SIGNUP WITH JOIN DATE ====================
+function doSignup() {
+  const name = document.getElementById('signupName').value.trim();
+  const id = document.getElementById('signupId').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const joinDate = document.getElementById('signupJoinDate').value;
+  const pass = document.getElementById('signupPass').value;
   const confirm = document.getElementById('signupConfirm').value;
 
-  if (!name || !sid || !email || !pass) return showToast('Please fill in all fields', 'error');
-  if (pass.length < 6)                  return showToast('Password must be at least 6 characters', 'error');
-  if (pass !== confirm)                 return showToast('Passwords do not match', 'error');
-  if (!email.includes('@'))             return showToast('Enter a valid email address', 'error');
+  // Validation
+  if (!name || !id || !joinDate || !pass) {
+    return showToast('Name, ID, Join Date, and Password are required!', 'error');
+  }
+  if (pass !== confirm) return showToast('Passwords do not match!', 'error');
+  if (pass.length < 6) return showToast('Password must be at least 6 characters!', 'error');
 
-  setLoading('signupBtn', true, 'Create Account →');
+  let users = JSON.parse(localStorage.getItem('unisphere_users') || '[]');
+  if (users.some(u => u.role === currentRole && (u.studentId === id || u.facultyId === id || u.adminId === id))) {
+    return showToast('This ID is already registered!', 'error');
+  }
 
-  const userData = {
-    name, studentId: sid, email, college, course,
-    role: currentRole,
-    cgpa: 0, attendance: 0, semester: 1,
-    createdAt: new Date().toISOString()
+  const user = { 
+    uid: Date.now().toString(), 
+    name, 
+    email,
+    role: currentRole, 
+    college: 'LD College of Engineering',
+    joinedAt: new Date(joinDate).getTime(), // User-selected join date
+    password: btoa(pass)
   };
 
-  if (firebaseReady) {
-    try {
-      const cred = await auth.createUserWithEmailAndPassword(email, pass);
-      await cred.user.updateProfile({ displayName: name });
-      await db.collection('users').doc(cred.user.uid).set(userData);
-      showToast(`✅ Account created! You can now log in.`, 'success');
-      switchTab('login');
-      document.getElementById('loginId').value = sid;
-    } catch(e) {
-      const msg = {
-        'auth/email-already-in-use': 'This email is already registered.',
-        'auth/invalid-email':        'Invalid email address.',
-        'auth/weak-password':        'Password is too weak (min 6 chars).'
-      }[e.code] || e.message;
-      showToast(msg, 'error');
-    }
+  // Role-specific fields
+  if (currentRole === 'faculty') {
+    user.facultyId = id;
+    user.dept = document.getElementById('signupDept').value || 'Computer Engineering';
+    user.designation = document.getElementById('signupDesig').value || 'Professor';
+    user.experience = parseInt(document.getElementById('signupExperience').value) || 0;
+    user.cabin = document.getElementById('signupCabin').value || 'TBD';
+    user.subjects = document.getElementById('signupSubjects').value.split(',').map(s => s.trim()).filter(Boolean);
+    user.classes = document.getElementById('signupClasses').value.split(',').map(s => s.trim()).filter(Boolean);
+  } else if (currentRole === 'admin') {
+    user.adminId = id;
+    user.adminRole = document.getElementById('signupAdminRole').value || 'Admin';
   } else {
-    // Local fallback
-    const existing = getLocalUsers();
-    if (existing.some(u => u.email === email)) return showToast('Email already registered', 'error') || setLoading('signupBtn', false, 'Create Account →');
-    saveLocalUser({ ...userData, password: pass });
-    showToast(`✅ Account created (local)! Configure Firebase for cross-device login.`, 'success');
-    switchTab('login');
-    document.getElementById('loginId').value = sid;
+    user.studentId = id;
+    user.course = document.getElementById('signupCourse').value || 'B.Tech Computer Engineering';
   }
 
-  setLoading('signupBtn', false, 'Create Account →');
+  users.push(user);
+  localStorage.setItem('unisphere_users', JSON.stringify(users));
+  
+  showToast(`Welcome ${name}! Account created successfully!`, 'success');
+  switchTab('login');
+  document.getElementById('loginId').value = id;
 }
 
-// ════════════════════════════════════════════
-//  LOGIN
-// ════════════════════════════════════════════
-async function doLogin() {
-  const sid  = document.getElementById('loginId').value.trim();
-  const pass = document.getElementById('loginPass').value;
+// ==================== LOGIN ====================
+function doLogin() {
+  const loginId = document.getElementById('loginId').value.trim();
+  const loginPass = document.getElementById('loginPass').value.trim();
+  const loginBtn = document.getElementById('loginBtn');
 
-  if (!sid || !pass) return showToast('Please enter your ID and password', 'error');
+  if (!loginId || !loginPass) return showToast('Please enter ID and Password', 'error');
 
-  setLoading('loginBtn', true, 'Login →');
+  loginBtn.disabled = true;
+  loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Logging in...';
 
-  if (firebaseReady) {
-    // Need email: look up email by studentId from Firestore
-    try {
-      const snap = await db.collection('users').where('studentId','==',sid).limit(1).get();
-      if (snap.empty) {
-        showToast('Student ID not found. Please sign up.', 'error');
-        setLoading('loginBtn', false, 'Login →');
-        return;
-      }
-      const userData = snap.docs[0].data();
-      const email    = userData.email;
+  setTimeout(() => {
+    let userFound = null;
 
-      await auth.signInWithEmailAndPassword(email, pass);
-      onLoginSuccess(userData);
-    } catch(e) {
-      const msg = {
-        'auth/wrong-password':    'Incorrect password.',
-        'auth/user-not-found':    'No account found for this ID.',
-        'auth/too-many-requests': 'Too many attempts. Try later.',
-        'auth/invalid-credential':'Invalid credentials.'
-      }[e.code] || 'Login failed. Check your credentials.';
-      showToast(msg, 'error');
-      setLoading('loginBtn', false, 'Login →');
+    // Demo accounts with join dates
+    if (currentRole === 'faculty' && loginId.toUpperCase() === 'FAC001' && loginPass === 'faculty123') {
+      userFound = {
+        name: "Dr. Ramesh Sharma", role: "faculty", facultyId: "FAC001",
+        dept: "Computer Engineering", designation: "Professor", experience: 15,
+        cabin: "CS-201", subjects: ["Data Structures", "Algorithms"], classes: ["CE-2A", "CE-3A"],
+        joinedAt: new Date('2023-08-15').getTime()
+      };
+    } else if (currentRole === 'admin' && loginId.toUpperCase() === 'ADM001' && loginPass === 'admin123') {
+      userFound = { name: "Super Admin", role: "admin", adminId: "ADM001", adminRole: "Super Admin", joinedAt: new Date('2022-01-10').getTime() };
+    } else if (currentRole === 'student' && loginId === '2023BCS045' && loginPass === 'student123') {
+      userFound = { name: "Dhaval Patel", role: "student", studentId: "2023BCS045", joinedAt: new Date('2023-07-20').getTime() };
+    } else {
+      const users = JSON.parse(localStorage.getItem('unisphere_users') || '[]');
+      userFound = users.find(u => u.role === currentRole && 
+        (u.studentId === loginId || u.facultyId === loginId || u.adminId === loginId) &&
+        atob(u.password) === loginPass);
     }
-  } else {
-    // Local fallback — match by studentId + password
-    const users = getLocalUsers();
-    const user  = users.find(u => u.studentId === sid && u.password === pass);
-    if (!user) {
-      showToast('Invalid credentials or account not found', 'error');
-      setLoading('loginBtn', false, 'Login →');
-      return;
+
+    resetLoginButton();
+    
+    if (userFound) {
+      currentUser = userFound;
+      showDashboard();
+    } else {
+      showToast('Invalid ID or Password!', 'error');
     }
-    onLoginSuccess(user);
-    setLoading('loginBtn', false, 'Login →');
-  }
+  }, 1500);
 }
 
-// ════════════════════════════════════════════
-//  FORGOT PASSWORD
-// ════════════════════════════════════════════
-async function doForgotPassword() {
-  const email = document.getElementById('resetEmail').value.trim();
-  if (!email) return showToast('Enter your email address', 'error');
-
-  if (!firebaseReady) {
-    showToast('Forgot password requires Firebase. Please configure it first.', 'error');
-    return;
-  }
-
-  try {
-    await auth.sendPasswordResetEmail(email);
-    showToast('✅ Reset email sent! Check your inbox.', 'success');
-    showLogin();
-  } catch(e) {
-    const msg = {
-      'auth/user-not-found':  'No account found with this email.',
-      'auth/invalid-email':   'Invalid email address.'
-    }[e.code] || 'Failed to send reset email.';
-    showToast(msg, 'error');
-  }
+function resetLoginButton() {
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = false;
+  btn.innerHTML = 'Login →';
 }
 
-// ════════════════════════════════════════════
-//  POST-LOGIN
-// ════════════════════════════════════════════
-function onLoginSuccess(userData) {
+function showDashboard() {
   document.getElementById('authPage').classList.add('hidden');
   document.getElementById('dashboard').classList.remove('hidden');
-  renderDashboard(userData);
+  
+  if (currentUser.role === 'faculty') renderFacultyDashboard();
+  else if (currentUser.role === 'admin') renderAdminDashboard();
+  else renderStudentDashboard();
 }
 
-function doLogout() {
-  if (firebaseReady) auth.signOut().catch(()=>{});
-  document.getElementById('dashboard').classList.add('hidden');
-  document.getElementById('authPage').classList.remove('hidden');
-  document.getElementById('loginId').value = '';
-  document.getElementById('loginPass').value = '';
-  showToast('Logged out successfully', 'info');
-}
-
-// ════════════════════════════════════════════
-//  DASHBOARD RENDER
-// ════════════════════════════════════════════
-function renderDashboard(user) {
-  document.getElementById('navName').textContent    = user.name;
-  document.getElementById('navId').textContent      = user.studentId;
-  document.getElementById('navCollege').textContent = user.college;
-
-  const first = user.name.split(' ')[0];
-
+// ==================== DASHBOARDS (showing join date) ====================
+function renderFacultyDashboard() {
   document.getElementById('dashContent').innerHTML = `
-    <div class="mb-8 slide-in">
-      <h1 class="text-2xl font-bold text-gray-900">Welcome back, ${first} 👋</h1>
-      <p class="text-gray-500 mt-1">${user.course} · ${user.college}</p>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-      <!-- Left Column -->
-      <div class="lg:col-span-4 space-y-5 slide-in">
-
-        <!-- ID Card -->
-        <div class="bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-3xl p-7 stat-card" style="background: linear-gradient(135deg,#2563eb,#4f46e5); color:white;">
-          <div class="flex justify-between items-start">
-            <div>
-              <p class="text-blue-200 text-xs mb-2">🎓 Student ID Card</p>
-              <h2 class="text-xl font-bold leading-tight">${user.name}</h2>
-              <p class="text-blue-200 text-sm mt-1">${user.studentId}</p>
-              <p class="text-blue-200 text-xs mt-1">${user.course}</p>
-            </div>
-            <div class="text-5xl">👨‍🎓</div>
-          </div>
-          <button onclick="showToast('ID card feature coming soon!','info')"
-            class="mt-6 w-full py-2.5 bg-white/20 hover:bg-white/30 rounded-xl text-sm font-medium transition">
-            Download ID Card
-          </button>
+    <div class="max-w-5xl mx-auto">
+      <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-12 pb-8 border-b border-white/10">
+        <div>
+          <h1 class="syne text-4xl lg:text-5xl font-bold mb-3">Welcome, ${currentUser.name.split(' ')[0]} 👋</h1>
+          <p class="text-xl text-slate-300">${currentUser.designation} - ${currentUser.dept}</p>
+          <p class="text-sm text-emerald-400 mt-1">Member since ${formatJoinDate(currentUser.joinedAt)}</p>
         </div>
-
-        <!-- Fees -->
-        <div class="stat-card">
-          <h3 class="font-semibold text-gray-800 mb-4">💳 Fees Status</h3>
-          <div class="space-y-3 text-sm">
-            <div class="flex justify-between items-center py-2 border-b border-gray-100">
-              <span class="text-gray-600">College Tuition Fee</span>
-              <span class="text-emerald-600 font-semibold">₹1,25,000 ✅</span>
-            </div>
-            <div class="flex justify-between items-center py-2">
-              <span class="text-gray-600">Exam Fees (Spring 2026)</span>
-              <span class="text-amber-600 font-semibold">₹4,200 ⏳ Due</span>
-            </div>
-          </div>
-          <button onclick="showToast('Redirecting to payment gateway…','info')"
-            class="mt-4 w-full py-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-xl text-sm font-semibold transition">
-            Pay Now
-          </button>
-        </div>
-
-        <!-- Attendance -->
-        <div class="stat-card text-center">
-          <h3 class="font-semibold text-gray-800 mb-3">📅 Attendance</h3>
-          <div class="text-6xl font-bold text-emerald-600">${user.attendance || 89}%</div>
-          <p class="text-xs text-gray-400 mt-2">Spring 2026 Semester</p>
-          <div class="mt-3 h-2 bg-gray-100 rounded-full overflow-hidden">
-            <div class="h-full bg-emerald-400 rounded-full" style="width:${user.attendance||89}%"></div>
+        <div class="bg-gradient-to-r from-emerald-500/20 to-blue-500/20 p-6 rounded-3xl border border-emerald-400/30">
+          <div class="flex items-center gap-3">
+            <i class="fas fa-map-marker-alt text-2xl text-emerald-400"></i>
+            <span>Cabin: <strong>${currentUser.cabin}</strong></span>
           </div>
         </div>
-
       </div>
 
-      <!-- Right Column -->
-      <div class="lg:col-span-8 space-y-6 slide-in">
-
-        <!-- Stats Row -->
-        <div class="grid grid-cols-3 gap-4">
-          <div class="stat-card text-center">
-            <p class="text-gray-500 text-xs mb-1">CGPA</p>
-            <p class="text-4xl font-bold text-blue-600">${user.cgpa || 8.74}</p>
-          </div>
-          <div class="stat-card text-center">
-            <p class="text-gray-500 text-xs mb-1">Semester</p>
-            <p class="text-4xl font-bold text-purple-600">${user.semester || 2}</p>
-          </div>
-          <div class="stat-card text-center">
-            <p class="text-gray-500 text-xs mb-1">Year</p>
-            <p class="text-4xl font-bold text-indigo-600">2<sup class="text-base">nd</sup></p>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="bg-[#111827]/80 p-8 rounded-3xl border border-white/10 backdrop-blur-sm">
+          <h3 class="syne text-2xl font-bold mb-6">Profile</h3>
+          <div class="space-y-4 text-sm">
+            <div class="flex justify-between"><span>ID:</span><strong>${currentUser.facultyId}</strong></div>
+            <div class="flex justify-between"><span>Department:</span><strong>${currentUser.dept}</strong></div>
+            <div class="flex justify-between"><span>Experience:</span><strong>${currentUser.experience} years</strong></div>
+            <div class="flex justify-between"><span>Joined:</span><strong>${formatJoinDate(currentUser.joinedAt)}</strong></div>
           </div>
         </div>
-
-        <!-- Subjects -->
-        <div class="stat-card overflow-hidden">
-          <h3 class="text-lg font-semibold text-gray-800 mb-5">📚 Current Semester Subjects</h3>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="border-b border-gray-100">
-                  <th class="text-left py-3 text-gray-500 font-medium">Subject</th>
-                  <th class="text-center py-3 text-gray-500 font-medium">Int.</th>
-                  <th class="text-center py-3 text-gray-500 font-medium">Ext.</th>
-                  <th class="text-center py-3 text-gray-500 font-medium">Total</th>
-                  <th class="text-center py-3 text-gray-500 font-medium">Grade</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${firstYearSubjects.map(s => `
-                  <tr class="border-b border-gray-50 subject-row transition">
-                    <td class="py-3.5 font-medium text-gray-800">${s.name}</td>
-                    <td class="py-3.5 text-center text-gray-600">${s.internal}</td>
-                    <td class="py-3.5 text-center text-gray-600">${s.external}</td>
-                    <td class="py-3.5 text-center font-semibold">${s.total}</td>
-                    <td class="py-3.5 text-center"><span class="grade-badge">${s.grade}</span></td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
+        <div class="bg-[#111827]/80 p-8 rounded-3xl border border-white/10 backdrop-blur-sm">
+          <h3 class="syne text-2xl font-bold mb-6">Classes</h3>
+          ${currentUser.classes?.map(cls => `
+            <div class="bg-slate-800/50 p-4 rounded-2xl mb-3 border border-slate-700 hover:border-emerald-500/50 transition-all">
+              <div class="flex justify-between">
+                <span class="font-semibold">${cls}</span>
+                <span class="text-emerald-400">${CLASS_STUDENT_COUNT[cls] || 65} students</span>
+              </div>
+            </div>
+          `).join('') || '<p class="text-slate-400 text-center py-8">No classes assigned</p>'}
         </div>
-
-        <!-- Degree Details -->
-        <div class="stat-card">
-          <h3 class="text-lg font-semibold text-gray-800 mb-5">🎓 Degree & Course Details</h3>
-          <div class="grid grid-cols-2 gap-5 text-sm">
-            <div><p class="text-gray-400 text-xs mb-0.5">Degree</p><p class="font-semibold">B.Tech</p></div>
-            <div><p class="text-gray-400 text-xs mb-0.5">Branch</p><p class="font-semibold">${user.course}</p></div>
-            <div><p class="text-gray-400 text-xs mb-0.5">College</p><p class="font-semibold">${user.college}</p></div>
-            <div><p class="text-gray-400 text-xs mb-0.5">Affiliation</p><p class="font-semibold">GTU</p></div>
-            <div><p class="text-gray-400 text-xs mb-0.5">Email</p><p class="font-semibold text-blue-600">${user.email || '—'}</p></div>
-            <div><p class="text-gray-400 text-xs mb-0.5">Student ID</p><p class="font-semibold">${user.studentId}</p></div>
-          </div>
-        </div>
-
       </div>
     </div>
   `;
 }
 
-// ════════════════════════════════════════════
-//  FIREBASE AUTH STATE LISTENER
-// ════════════════════════════════════════════
-function setupAuthListener() {
-  if (!firebaseReady) return;
-  auth.onAuthStateChanged(async (fbUser) => {
-    if (fbUser) {
-      try {
-        const doc = await db.collection('users').doc(fbUser.uid).get();
-        if (doc.exists) {
-          onLoginSuccess(doc.data());
-        }
-      } catch(e) { /* silently ignore */ }
-    }
-  });
+function renderStudentDashboard() {
+  document.getElementById('dashContent').innerHTML = `
+    <div class="max-w-5xl mx-auto">
+      <h1 class="syne text-4xl font-bold mb-4">Welcome ${currentUser.name}!</h1>
+      <p class="text-2xl text-slate-300 mb-12">ID: ${currentUser.studentId} • Joined: ${formatJoinDate(currentUser.joinedAt)}</p>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="bg-[#111827]/80 p-10 rounded-3xl border border-white/10 text-center">
+          <i class="fas fa-graduation-cap text-6xl text-emerald-400 mb-6"></i>
+          <h3 class="text-2xl font-bold mb-4">B.Tech Computer Engineering</h3>
+          <p class="text-slate-400">CE-2A • 68 students</p>
+        </div>
+        <div class="bg-[#111827]/80 p-8 rounded-3xl border border-white/10">
+          <h3 class="text-2xl font-bold mb-6">Today's Classes</h3>
+          <div class="space-y-4">
+            <div class="p-6 bg-slate-800 rounded-2xl border border-slate-700">
+              <div class="flex justify-between mb-2"><strong>Algorithms</strong><span>2:00 PM</span></div>
+              <p class="text-sm text-slate-400">CS-201 • Dr. Ramesh Sharma</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
-// ════════════════════════════════════════════
-//  INIT
-// ════════════════════════════════════════════
-window.onload = () => {
-  loadSavedConfig();
-  setupAuthListener();
-  selectRole('student');
-};
+function renderAdminDashboard() {
+  document.getElementById('dashContent').innerHTML = `
+    <div class="max-w-6xl mx-auto">
+      <h1 class="syne text-5xl font-bold mb-6">Admin Dashboard</h1>
+      <p class="text-2xl mb-2">${currentUser.name} (${currentUser.adminRole})</p>
+      <p class="text-lg text-slate-400">Member since ${formatJoinDate(currentUser.joinedAt)}</p>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+        <div class="bg-gradient-to-b from-purple-500/20 p-8 rounded-3xl border border-purple-500/30 text-center">
+          <div class="text-4xl mb-4">👨‍🎓</div>
+          <h3 class="text-3xl font-bold">1,245</h3>
+          <p>Students</p>
+        </div>
+        <div class="bg-gradient-to-b from-emerald-500/20 p-8 rounded-3xl border border-emerald-500/30 text-center">
+          <div class="text-4xl mb-4">👨‍🏫</div>
+          <h3 class="text-3xl font-bold">87</h3>
+          <p>Faculty</p>
+        </div>
+        <div class="bg-gradient-to-b from-orange-500/20 p-8 rounded-3xl border border-orange-500/30 text-center">
+          <div class="text-4xl mb-4">📚</div>
+          <h3 class="text-3xl font-bold">45</h3>
+          <p>Courses</p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ==================== FIXED LOGOUT ====================
+function doLogout() {
+  if (confirm(`Logout ${currentUser?.name || ''}?`)) {
+    currentUser = null;
+    document.getElementById('dashboard').classList.add('hidden');
+    document.getElementById('authPage').classList.remove('hidden');
+    
+    // Clear forms
+    document.querySelectorAll('.field').forEach(field => field.value = '');
+    document.getElementById('loginPass').type = 'password';
+    document.getElementById('eyeL').className = 'fas fa-eye';
+    
+    selectRole('student');
+    switchTab('login');
+    showToast('Logged out successfully!', 'success');
+  }
+}
+
+// Initialize
+selectRole('student');
+setMaxJoinDate();
 </script>
 </body>
 </html>
