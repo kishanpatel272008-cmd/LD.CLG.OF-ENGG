@@ -1,463 +1,411 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UniSphere – LD College Portal</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GTU | LDCE Portal</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+    body { background: #f0f4f8; color: #333; }
 
-<style>
-  body { font-family: 'DM Sans', sans-serif; background: #0a1628; color: #f1f5f9; min-height: 100vh; margin: 0; }
-  .syne { font-family: 'Syne', sans-serif; }
-  
-  .auth-card {
-    background: linear-gradient(145deg, #0d1b2e, #0a1628);
-    border: 1px solid rgba(99,102,241,0.3);
-    border-radius: 28px;
-    max-width: 480px;
-    width: 100%;
-  }
-  .field {
-    width: 100%; padding: 14px 16px; background: rgba(255,255,255,0.06);
-    border: 1.5px solid rgba(255,255,255,0.12); border-radius: 12px;
-    color: #f1f5f9; outline: none;
-  }
-  .field:focus { border-color: #6366f1; background: rgba(255,255,255,0.1); }
-  
-  .btn-primary {
-    background: linear-gradient(135deg, #2563eb, #4338ca);
-    color: white; padding: 14px; border-radius: 13px; font-weight: 600; width: 100%;
-    transition: all 0.2s;
-  }
-  .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
-  .role-card.selected { border-color: #6366f1; background: rgba(99,102,241,0.2); }
-  
-  #toast {
-    position: fixed; top: 20px; right: 20px; padding: 14px 20px; border-radius: 14px;
-    z-index: 9999; opacity: 0; transition: all 0.3s; transform: translateX(100%);
-  }
-  #toast.show { opacity: 1; transform: translateX(0); }
-  
-  /* Logout button - ultra specific */
-  nav button[onclick="doLogout()"] {
-    color: #f87171 !important; background: rgba(248,113,113,0.2) !important;
-    border: 2px solid rgba(248,113,113,0.4) !important; font-weight: 600 !important;
-    padding: 12px 24px !important; border-radius: 12px !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  }
-  nav button[onclick="doLogout()"]:hover {
-    background: rgba(239,68,68,0.3) !important; border-color: #ef4444 !important;
-    color: white !important; transform: translateY(-2px) !important; box-shadow: 0 10px 25px rgba(239,68,68,0.3) !important;
-  }
-</style>
+    header {
+      background: linear-gradient(135deg, #003087, #0055cc);
+      color: white;
+      padding: 2.2rem 0;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .logo { font-size: 2.9rem; font-weight: bold; }
+    .college-name { font-size: 1.35rem; margin-top: 8px; opacity: 0.95; }
+
+    nav {
+      background: #002266;
+      padding: 1.2rem;
+      text-align: center;
+    }
+    nav a {
+      color: white;
+      margin: 0 20px;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    nav a:hover { color: #ffd700; }
+
+    .container { max-width: 1350px; margin: 30px auto; padding: 0 20px; }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+      padding: 35px;
+      margin-bottom: 30px;
+    }
+
+    h2 { color: #003087; margin-bottom: 25px; font-size: 2rem; }
+    h3 { color: #0055cc; margin-bottom: 15px; }
+
+    form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 18px;
+    }
+
+    input, select, button {
+      padding: 14px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      background: #003087;
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover { background: #002266; transform: translateY(-3px); }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+      gap: 25px;
+    }
+
+    .feature-box {
+      background: #fafcff;
+      border: 1px solid #e6ecf5;
+      border-radius: 14px;
+      padding: 25px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { padding: 12px 10px; border-bottom: 1px solid #eee; text-align: left; }
+    th { background: #f0f4ff; color: #003087; }
+
+    .hidden { display: none; }
+  </style>
 </head>
 <body>
 
-<div id="toast"></div>
+  <header>
+    <div class="logo">GTU</div>
+    <p class="college-name">L.D. College of Engineering, Ahmedabad</p>
+  </header>
 
-<!-- AUTH PAGE -->
-<div id="authPage" class="min-h-screen flex items-center justify-center p-4">
-  <div class="auth-card p-8">
-    <div class="text-center mb-8">
-      <div class="text-5xl mb-4">🎓</div>
-      <h1 class="syne text-3xl font-bold">UniSphere</h1>
-      <p class="text-slate-400">LD College of Engineering Portal</p>
-    </div>
-
-    <!-- Role Selector -->
-    <div class="flex gap-3 mb-6">
-      <button onclick="selectRole('student')" id="roleStudent" class="role-card selected flex-1 py-4 rounded-2xl border-2 border-transparent flex flex-col items-center">
-        <i class="fas fa-user-graduate text-2xl mb-1"></i><span class="text-sm">Student</span>
-      </button>
-      <button onclick="selectRole('faculty')" id="roleFaculty" class="role-card flex-1 py-4 rounded-2xl border-2 border-transparent flex flex-col items-center">
-        <i class="fas fa-chalkboard-teacher text-2xl mb-1 text-emerald-400"></i><span class="text-sm">Faculty</span>
-      </button>
-      <button onclick="selectRole('admin')" id="roleAdmin" class="role-card flex-1 py-4 rounded-2xl border-2 border-transparent flex flex-col items-center">
-        <i class="fas fa-shield-alt text-2xl mb-1 text-purple-400"></i><span class="text-sm">Admin</span>
-      </button>
-    </div>
-
-    <!-- Tabs -->
-    <div class="flex bg-slate-800 rounded-2xl p-1 mb-6">
-      <button onclick="switchTab('login')" id="tabLogin" class="flex-1 py-3 rounded-xl font-medium bg-white/10">Login</button>
-      <button onclick="switchTab('signup')" id="tabSignup" class="flex-1 py-3 rounded-xl font-medium">Sign Up</button>
-    </div>
-
-    <!-- LOGIN FORM -->
-    <div id="loginForm">
-      <div class="mb-4">
-        <label class="text-xs font-semibold text-slate-400 block mb-2" id="loginIdLabel">Student ID</label>
-        <input id="loginId" class="field" placeholder="e.g. FAC001 or ADM001 or 2023BCS045">
-      </div>
-      <div class="relative mb-6">
-        <label class="text-xs font-semibold text-slate-400 block mb-2">Password</label>
-        <input id="loginPass" type="password" class="field w-full" placeholder="Enter password" onkeydown="if(event.key==='Enter') doLogin()">
-        <button onclick="togglePassword('loginPass','eyeL')" class="absolute right-4 top-10 text-slate-400 hover:text-white">
-          <i id="eyeL" class="fas fa-eye"></i>
-        </button>
-      </div>
-      <button onclick="doLogin()" id="loginBtn" class="btn-primary">Login →</button>
-      <div id="demoHint" class="text-center text-xs mt-4 text-slate-400"></div>
-    </div>
-
-    <!-- SIGNUP FORM -->
-    <div id="signupForm" class="hidden space-y-4">
-      <input id="signupName" class="field" placeholder="Full Name *">
-      <input id="signupId" class="field" placeholder="ID *">
-      <input id="signupEmail" class="field" type="email" placeholder="Email">
-      
-      <!-- NEW: JOIN DATE FIELD -->
-      <div>
-        <label class="text-xs font-semibold text-slate-400 block mb-2">Join Date *</label>
-        <input id="signupJoinDate" type="date" class="field" max="">
-      </div>
-      
-      <div id="signupExtraFields"></div>
-      
-      <input id="signupPass" type="password" class="field" placeholder="Password *">
-      <input id="signupConfirm" type="password" class="field" placeholder="Confirm Password *" onkeydown="if(event.key==='Enter') doSignup()">
-      
-      <button onclick="doSignup()" class="btn-primary">Create Account →</button>
-    </div>
-  </div>
-</div>
-
-<!-- DASHBOARD -->
-<div id="dashboard" class="hidden min-h-screen bg-[#0a1628]">
-  <nav class="bg-[#0f1f3d] p-5 border-b border-white/10">
-    <div class="max-w-6xl mx-auto flex justify-between items-center">
-      <div class="flex items-center gap-3">
-        <span class="text-3xl">🎓</span>
-        <div>
-          <h1 class="syne text-2xl font-bold">UniSphere</h1>
-          <p class="text-xs text-slate-400" id="navCollege">LD College of Engineering</p>
-        </div>
-      </div>
-      <button onclick="doLogout()" class="flex items-center gap-2">
-        <i class="fas fa-sign-out-alt"></i>
-        <span>Logout</span>
-      </button>
-    </div>
+  <nav>
+    <a href="#" onclick="showHome()">Home</a>
+    <a href="#" onclick="showSection('coursesSection')">Courses</a>
+    <a href="#" onclick="showSection('admissionSection')">Admissions</a>
+    <a href="#" onclick="showLogin('student')">Student Login</a>
+    <a href="#" onclick="showLogin('faculty')">Faculty Login</a>
   </nav>
 
-  <div id="dashContent" class="max-w-6xl mx-auto p-6 min-h-[70vh]"></div>
-</div>
+  <div class="container">
 
-<script>
-// ==================== STATE ====================
-let currentRole = 'student';
-let currentUser = null;
+    <!-- Home -->
+    <div class="card" id="homeSection">
+      <h2>Welcome to L.D. College of Engineering</h2>
+      <p style="font-size:1.15rem;">Register with your details and password to access the portal.</p>
+    </div>
 
-const CLASS_STUDENT_COUNT = { "CE-2A": 68, "CE-3A": 72, "CE-4A": 65, "CE-4B": 70 };
+    <!-- Courses & Admissions -->
+    <div class="card hidden" id="coursesSection">
+      <h2>B.E. Degree Programs</h2>
+      <ul style="font-size:1.1rem; line-height:2.2;">
+        <li>Computer Engineering</li>
+        <li>Information Technology</li>
+        <li>Mechanical Engineering</li>
+        <li>Civil Engineering</li>
+        <li>Electrical Engineering</li>
+        <li>Electronics & Communication</li>
+      </ul>
+    </div>
 
-// Format join date
-function formatJoinDate(dateString) {
-  if (!dateString) return 'Not specified';
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-IN', { 
-    year: 'numeric', month: 'long', day: 'numeric' 
-  });
-}
+    <div class="card hidden" id="admissionSection">
+      <h2>Admissions 2026-27</h2>
+      <p><strong>Eligibility:</strong> 10+2 with PCM</p>
+    </div>
 
-// ==================== UI FUNCTIONS ====================
-function selectRole(role) {
-  currentRole = role;
-  ['roleStudent', 'roleFaculty', 'roleAdmin'].forEach(id => {
-    document.getElementById(id).classList.toggle('selected', currentRole === id.replace('role', '').toLowerCase());
-  });
+    <!-- ====================== STUDENT ====================== -->
+    <div class="card hidden" id="studentLoginSection">
+      <h2>Student Login</h2>
+      <form id="studentLoginForm">
+        <input type="text" id="loginStudentEnrollment" placeholder="Enrollment Number" required>
+        <input type="password" id="loginStudentPassword" placeholder="Password" required>
+        <button type="submit">Login</button>
+      </form>
+      <p style="text-align:center; margin-top:20px;">New Student? <a href="#" onclick="showStudentRegister()">Register Here</a></p>
+    </div>
 
-  document.getElementById('loginIdLabel').textContent = 
-    role === 'student' ? 'Student ID' : role === 'faculty' ? 'Faculty ID' : 'Admin ID';
+    <div class="card hidden" id="studentRegisterSection">
+      <h2>Student Registration</h2>
+      <form id="studentRegisterForm">
+        <input type="text" id="regStudentName" placeholder="Full Name" required>
+        <input type="text" id="regStudentEnrollment" placeholder="Enrollment Number" required>
+        <select id="regStudentBranch" required>
+          <option value="">Select Branch</option>
+          <option>Computer Engineering</option>
+          <option>Information Technology</option>
+          <option>Mechanical Engineering</option>
+          <option>Civil Engineering</option>
+        </select>
+        <input type="email" placeholder="Email" required>
+        <input type="tel" placeholder="Mobile Number" required>
+        <input type="password" id="regStudentPassword" placeholder="Create Password" required>
+        <button type="submit">Register</button>
+      </form>
+    </div>
 
-  document.getElementById('demoHint').innerHTML = 
-    role === 'faculty' ? `Demo: <strong>FAC001</strong> / <strong>faculty123</strong>` :
-    role === 'admin' ? `Demo: <strong>ADM001</strong> / <strong>admin123</strong>` :
-    `Demo: <strong>2023BCS045</strong> / <strong>student123</strong>`;
+    <!-- ====================== FACULTY ====================== -->
+    <div class="card hidden" id="facultyLoginSection">
+      <h2>Faculty Login</h2>
+      <form id="facultyLoginForm">
+        <input type="text" id="loginFacultyId" placeholder="Faculty ID" required>
+        <input type="password" id="loginFacultyPassword" placeholder="Password" required>
+        <button type="submit">Login</button>
+      </form>
+      <p style="text-align:center; margin-top:20px;">New Faculty? <a href="#" onclick="showFacultyRegister()">Register Here</a></p>
+    </div>
 
-  renderSignupExtraFields();
-  setMaxJoinDate();
-}
+    <div class="card hidden" id="facultyRegisterSection">
+      <h2>Faculty Registration</h2>
+      <form id="facultyRegisterForm">
+        <input type="text" id="regFacultyName" placeholder="Full Name" required>
+        <input type="text" id="regFacultyId" placeholder="Faculty ID" required>
+        <input type="email" placeholder="Email ID" required>
+        <select id="regFacultyDept" required>
+          <option value="">Select Department</option>
+          <option>Computer Engineering</option>
+          <option>Information Technology</option>
+          <option>Mechanical Engineering</option>
+        </select>
+        <input type="password" id="regFacultyPassword" placeholder="Create Password" required>
+        <button type="submit">Register as Faculty</button>
+      </form>
+    </div>
 
-function setMaxJoinDate() {
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('signupJoinDate').max = today;
-  document.getElementById('signupJoinDate').value = today; // Default to today
-}
+    <!-- ====================== STUDENT DASHBOARD ====================== -->
+    <div class="card hidden" id="studentDashboard">
+      <h2>Welcome, <span id="studentName"></span> | Student Portal</h2>
+      <div class="dashboard-grid">
+        <div class="feature-box">
+          <h3>Personal Information</h3>
+          <p><strong>Enrollment No:</strong> <span id="enrollNo"></span></p>
+          <p><strong>Branch:</strong> <span id="branch"></span></p>
+          <p><strong>Mobile:</strong> 98765 43210</p>
+          <p><strong>Semester:</strong> 6th</p>
+        </div>
 
-function renderSignupExtraFields() {
-  const container = document.getElementById('signupExtraFields');
-  if (currentRole === 'faculty') {
-    container.innerHTML = `
-      <input id="signupDept" class="field" value="Computer Engineering" placeholder="Department">
-      <input id="signupDesig" class="field" value="Professor" placeholder="Designation">
-      <input id="signupExperience" type="number" class="field" value="8" placeholder="Experience (years)" min="0">
-      <input id="signupCabin" class="field" value="CS-305" placeholder="Cabin No.">
-      <input id="signupSubjects" class="field" value="Data Structures, Algorithms" placeholder="Subjects (comma separated)">
-      <input id="signupClasses" class="field" value="CE-2A, CE-3A" placeholder="Classes (comma separated)">
-    `;
-  } else if (currentRole === 'admin') {
-    container.innerHTML = `<input id="signupAdminRole" class="field" value="Super Admin" placeholder="Admin Role">`;
-  } else {
-    container.innerHTML = `<input id="signupCourse" class="field" value="B.Tech Computer Engineering" placeholder="Course">`;
-  }
-}
+        <div class="feature-box">
+          <h3>Academic Performance</h3>
+          <p><strong>Current CGPA:</strong> <span id="cgpa">8.45</span></p>
+          <p><strong>Attendance:</strong> <span id="attendance">87%</span></p>
+          <button onclick="refreshAcademic()">Refresh</button>
+        </div>
 
-function switchTab(tab) {
-  document.getElementById('loginForm').classList.toggle('hidden', tab !== 'login');
-  document.getElementById('signupForm').classList.toggle('hidden', tab !== 'signup');
-}
+        <div class="feature-box">
+          <h3>Fees Details</h3>
+          <p><strong>College Fees:</strong> ₹12,500</p>
+          <p><strong>Exam Fees:</strong> ₹1,500</p>
+          <p><strong>Total Due:</strong> <strong>₹14,000</strong></p>
+        </div>
 
-function togglePassword(id, iconId) {
-  const input = document.getElementById(id);
-  const icon = document.getElementById(iconId);
-  input.type = input.type === 'password' ? 'text' : 'password';
-  icon.classList.toggle('fa-eye');
-  icon.classList.toggle('fa-eye-slash');
-}
+        <div class="feature-box">
+          <h3>Current Subjects</h3>
+          <ul style="line-height:1.8;">
+            <li>Mathematics - 02</li>
+            <li>Physics</li>
+            <li>Fundamental of AI (FAI)</li>
+            <li>Engineering Graphics & Design (EGD)</li>
+            <li>Basic Electrical Engineering (BEE)</li>
+            <li>English for Technical Communication (ETC)</li>
+          </ul>
+        </div>
 
-function showToast(msg, type = 'info') {
-  const toast = document.getElementById('toast');
-  toast.textContent = msg;
-  toast.className = `show bg-emerald-600/95 backdrop-blur-lg border border-emerald-400/50 shadow-2xl ${type === 'error' ? 'bg-red-600/95 border-red-400/50' : ''}`;
-  setTimeout(() => toast.classList.remove('show'), 4000);
-}
+        <div class="feature-box">
+          <h3>My Time Table</h3>
+          <table>
+            <tr><th>Day</th><th>Subject</th><th>Time</th><th>Room</th></tr>
+            <tr><td>Monday</td><td>Mathematics</td><td>09:00-11:00</td><td>301</td></tr>
+            <tr><td>Tuesday</td><td>Physics</td><td>11:30-13:30</td><td>302</td></tr>
+            <tr><td>Wednesday</td><td>EGD</td><td>14:00-16:00</td><td>Drawing Hall</td></tr>
+            <tr><td>Thursday</td><td>BEE</td><td>09:30-11:30</td><td>Lab-3</td></tr>
+            <tr><td>Friday</td><td>ETC</td><td>11:00-12:00</td><td>303</td></tr>
+          </table>
+        </div>
 
-// ==================== SIGNUP WITH JOIN DATE ====================
-function doSignup() {
-  const name = document.getElementById('signupName').value.trim();
-  const id = document.getElementById('signupId').value.trim();
-  const email = document.getElementById('signupEmail').value.trim();
-  const joinDate = document.getElementById('signupJoinDate').value;
-  const pass = document.getElementById('signupPass').value;
-  const confirm = document.getElementById('signupConfirm').value;
+        <div class="feature-box">
+          <h3>Semester Result</h3>
+          <table>
+            <tr><th>Subject</th><th>Marks</th><th>Grade</th></tr>
+            <tr><td>Mathematics - 02</td><td>82</td><td>A</td></tr>
+            <tr><td>Physics</td><td>76</td><td>B+</td></tr>
+            <tr><td>FAI</td><td>85</td><td>A</td></tr>
+            <tr><td>EGD</td><td>91</td><td>A+</td></tr>
+            <tr><td>BEE</td><td>78</td><td>B+</td></tr>
+            <tr><td>ETC</td><td>88</td><td>A</td></tr>
+          </table>
+        </div>
+      </div>
 
-  // Validation
-  if (!name || !id || !joinDate || !pass) {
-    return showToast('Name, ID, Join Date, and Password are required!', 'error');
-  }
-  if (pass !== confirm) return showToast('Passwords do not match!', 'error');
-  if (pass.length < 6) return showToast('Password must be at least 6 characters!', 'error');
+      <div style="text-align:center; margin-top:40px;">
+        <button onclick="logout()" style="background:#cc0000; padding:14px 45px;">Logout</button>
+      </div>
+    </div>
 
-  let users = JSON.parse(localStorage.getItem('unisphere_users') || '[]');
-  if (users.some(u => u.role === currentRole && (u.studentId === id || u.facultyId === id || u.adminId === id))) {
-    return showToast('This ID is already registered!', 'error');
-  }
+    <!-- ====================== FACULTY DASHBOARD ====================== -->
+    <div class="card hidden" id="facultyDashboard">
+      <h2>Welcome, <span id="facultyName"></span> | Faculty Portal</h2>
+      <div class="dashboard-grid">
+        <div class="feature-box">
+          <h3>My Subjects</h3>
+          <ul>
+            <li>Mathematics - 02</li>
+            <li>Engineering Graphics & Design (EGD)</li>
+            <li>Basic Electrical Engineering (BEE)</li>
+            <li>English for Technical Communication (ETC)</li>
+          </ul>
+        </div>
+        <div class="feature-box">
+          <h3>My Time Table</h3>
+          <table>
+            <tr><th>Day</th><th>Subject</th><th>Time</th><th>Class</th></tr>
+            <tr><td>Monday</td><td>Mathematics</td><td>09:00-11:00</td><td>301</td></tr>
+            <tr><td>Tuesday</td><td>EGD</td><td>11:30-13:30</td><td>Drawing Hall</td></tr>
+            <tr><td>Wednesday</td><td>BEE</td><td>14:00-16:00</td><td>Lab-3</td></tr>
+          </table>
+        </div>
+        <div class="feature-box">
+          <h3>Student Overview</h3>
+          <p><strong>Total Students:</strong> 68</p>
+          <p><strong>Average Marks:</strong> 73.8%</p>
+          <button onclick="refreshFacultyData()">Refresh</button>
+        </div>
+      </div>
+      <div style="text-align:center; margin-top:40px;">
+        <button onclick="logout()" style="background:#cc0000; padding:14px 45px;">Logout</button>
+      </div>
+    </div>
 
-  const user = { 
-    uid: Date.now().toString(), 
-    name, 
-    email,
-    role: currentRole, 
-    college: 'LD College of Engineering',
-    joinedAt: new Date(joinDate).getTime(), // User-selected join date
-    password: btoa(pass)
-  };
+  </div>
 
-  // Role-specific fields
-  if (currentRole === 'faculty') {
-    user.facultyId = id;
-    user.dept = document.getElementById('signupDept').value || 'Computer Engineering';
-    user.designation = document.getElementById('signupDesig').value || 'Professor';
-    user.experience = parseInt(document.getElementById('signupExperience').value) || 0;
-    user.cabin = document.getElementById('signupCabin').value || 'TBD';
-    user.subjects = document.getElementById('signupSubjects').value.split(',').map(s => s.trim()).filter(Boolean);
-    user.classes = document.getElementById('signupClasses').value.split(',').map(s => s.trim()).filter(Boolean);
-  } else if (currentRole === 'admin') {
-    user.adminId = id;
-    user.adminRole = document.getElementById('signupAdminRole').value || 'Admin';
-  } else {
-    user.studentId = id;
-    user.course = document.getElementById('signupCourse').value || 'B.Tech Computer Engineering';
-  }
+  <script>
+    let registeredStudents = {};
+    let registeredFaculty = {};
 
-  users.push(user);
-  localStorage.setItem('unisphere_users', JSON.stringify(users));
-  
-  showToast(`Welcome ${name}! Account created successfully!`, 'success');
-  switchTab('login');
-  document.getElementById('loginId').value = id;
-}
+    function hideAll() {
+      document.querySelectorAll('.card').forEach(card => card.classList.add('hidden'));
+    }
 
-// ==================== LOGIN ====================
-function doLogin() {
-  const loginId = document.getElementById('loginId').value.trim();
-  const loginPass = document.getElementById('loginPass').value.trim();
-  const loginBtn = document.getElementById('loginBtn');
+    function showHome() { hideAll(); document.getElementById('homeSection').classList.remove('hidden'); }
+    function showSection(id) { hideAll(); document.getElementById(id).classList.remove('hidden'); }
 
-  if (!loginId || !loginPass) return showToast('Please enter ID and Password', 'error');
+    function showLogin(type) {
+      hideAll();
+      if (type === 'student') document.getElementById('studentLoginSection').classList.remove('hidden');
+      else document.getElementById('facultyLoginSection').classList.remove('hidden');
+    }
 
-  loginBtn.disabled = true;
-  loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Logging in...';
+    function showStudentRegister() { hideAll(); document.getElementById('studentRegisterSection').classList.remove('hidden'); }
+    function showFacultyRegister() { hideAll(); document.getElementById('facultyRegisterSection').classList.remove('hidden'); }
 
-  setTimeout(() => {
-    let userFound = null;
+    // Student Registration (with Password)
+    document.getElementById('studentRegisterForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const enrollment = document.getElementById('regStudentEnrollment').value.trim();
+      const name = document.getElementById('regStudentName').value.trim();
+      const branch = document.getElementById('regStudentBranch').value;
+      const password = document.getElementById('regStudentPassword').value;
 
-    // Demo accounts with join dates
-    if (currentRole === 'faculty' && loginId.toUpperCase() === 'FAC001' && loginPass === 'faculty123') {
-      userFound = {
-        name: "Dr. Ramesh Sharma", role: "faculty", facultyId: "FAC001",
-        dept: "Computer Engineering", designation: "Professor", experience: 15,
-        cabin: "CS-201", subjects: ["Data Structures", "Algorithms"], classes: ["CE-2A", "CE-3A"],
-        joinedAt: new Date('2023-08-15').getTime()
+      if (!enrollment || !name || !branch || !password) {
+        return alert("Please fill all fields including password");
+      }
+
+      registeredStudents[enrollment] = { 
+        name, 
+        enrollment, 
+        branch, 
+        password 
       };
-    } else if (currentRole === 'admin' && loginId.toUpperCase() === 'ADM001' && loginPass === 'admin123') {
-      userFound = { name: "Super Admin", role: "admin", adminId: "ADM001", adminRole: "Super Admin", joinedAt: new Date('2022-01-10').getTime() };
-    } else if (currentRole === 'student' && loginId === '2023BCS045' && loginPass === 'student123') {
-      userFound = { name: "Dhaval Patel", role: "student", studentId: "2023BCS045", joinedAt: new Date('2023-07-20').getTime() };
-    } else {
-      const users = JSON.parse(localStorage.getItem('unisphere_users') || '[]');
-      userFound = users.find(u => u.role === currentRole && 
-        (u.studentId === loginId || u.facultyId === loginId || u.adminId === loginId) &&
-        atob(u.password) === loginPass);
+
+      alert(`✅ Registration Successful!\nEnrollment: ${enrollment}\nYou can now login.`);
+      showLogin('student');
+    });
+
+    // Student Login
+    document.getElementById('studentLoginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const enrollment = document.getElementById('loginStudentEnrollment').value.trim();
+      const password = document.getElementById('loginStudentPassword').value;
+
+      const student = registeredStudents[enrollment];
+
+      if (!student) {
+        return alert("❌ No account found with this Enrollment Number!");
+      }
+
+      if (student.password !== password) {
+        return alert("❌ Incorrect Password!");
+      }
+
+      hideAll();
+      document.getElementById('studentDashboard').classList.remove('hidden');
+      document.getElementById('studentName').textContent = student.name;
+      document.getElementById('enrollNo').textContent = student.enrollment;
+      document.getElementById('branch').textContent = student.branch;
+    });
+
+    // Faculty Registration (with Password)
+    document.getElementById('facultyRegisterForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const id = document.getElementById('regFacultyId').value.trim();
+      const name = document.getElementById('regFacultyName').value.trim();
+      const password = document.getElementById('regFacultyPassword').value;
+
+      if (!id || !name || !password) return alert("Please fill all fields");
+
+      registeredFaculty[id] = { name, id, password };
+
+      alert(`✅ Faculty Registered Successfully!\nFaculty ID: ${id}`);
+      showLogin('faculty');
+    });
+
+    // Faculty Login
+    document.getElementById('facultyLoginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const id = document.getElementById('loginFacultyId').value.trim();
+      const password = document.getElementById('loginFacultyPassword').value;
+
+      const faculty = registeredFaculty[id];
+
+      if (!faculty) return alert("❌ No faculty account found!");
+      if (faculty.password !== password) return alert("❌ Incorrect Password!");
+
+      hideAll();
+      document.getElementById('facultyDashboard').classList.remove('hidden');
+      document.getElementById('facultyName').textContent = faculty.name;
+    });
+
+    function refreshAcademic() {
+      document.getElementById('cgpa').textContent = (8.0 + Math.random() * 0.9).toFixed(2);
+      document.getElementById('attendance').textContent = Math.floor(82 + Math.random() * 13) + "%";
+      alert("Academic data refreshed!");
     }
 
-    resetLoginButton();
-    
-    if (userFound) {
-      currentUser = userFound;
-      showDashboard();
-    } else {
-      showToast('Invalid ID or Password!', 'error');
+    function refreshFacultyData() {
+      alert("Student data refreshed successfully!");
     }
-  }, 1500);
-}
 
-function resetLoginButton() {
-  const btn = document.getElementById('loginBtn');
-  btn.disabled = false;
-  btn.innerHTML = 'Login →';
-}
+    function logout() {
+      hideAll();
+      document.getElementById('homeSection').classList.remove('hidden');
+      alert("You have been logged out.");
+    }
 
-function showDashboard() {
-  document.getElementById('authPage').classList.add('hidden');
-  document.getElementById('dashboard').classList.remove('hidden');
-  
-  if (currentUser.role === 'faculty') renderFacultyDashboard();
-  else if (currentUser.role === 'admin') renderAdminDashboard();
-  else renderStudentDashboard();
-}
-
-// ==================== DASHBOARDS (showing join date) ====================
-function renderFacultyDashboard() {
-  document.getElementById('dashContent').innerHTML = `
-    <div class="max-w-5xl mx-auto">
-      <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-12 pb-8 border-b border-white/10">
-        <div>
-          <h1 class="syne text-4xl lg:text-5xl font-bold mb-3">Welcome, ${currentUser.name.split(' ')[0]} 👋</h1>
-          <p class="text-xl text-slate-300">${currentUser.designation} - ${currentUser.dept}</p>
-          <p class="text-sm text-emerald-400 mt-1">Member since ${formatJoinDate(currentUser.joinedAt)}</p>
-        </div>
-        <div class="bg-gradient-to-r from-emerald-500/20 to-blue-500/20 p-6 rounded-3xl border border-emerald-400/30">
-          <div class="flex items-center gap-3">
-            <i class="fas fa-map-marker-alt text-2xl text-emerald-400"></i>
-            <span>Cabin: <strong>${currentUser.cabin}</strong></span>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div class="bg-[#111827]/80 p-8 rounded-3xl border border-white/10 backdrop-blur-sm">
-          <h3 class="syne text-2xl font-bold mb-6">Profile</h3>
-          <div class="space-y-4 text-sm">
-            <div class="flex justify-between"><span>ID:</span><strong>${currentUser.facultyId}</strong></div>
-            <div class="flex justify-between"><span>Department:</span><strong>${currentUser.dept}</strong></div>
-            <div class="flex justify-between"><span>Experience:</span><strong>${currentUser.experience} years</strong></div>
-            <div class="flex justify-between"><span>Joined:</span><strong>${formatJoinDate(currentUser.joinedAt)}</strong></div>
-          </div>
-        </div>
-        <div class="bg-[#111827]/80 p-8 rounded-3xl border border-white/10 backdrop-blur-sm">
-          <h3 class="syne text-2xl font-bold mb-6">Classes</h3>
-          ${currentUser.classes?.map(cls => `
-            <div class="bg-slate-800/50 p-4 rounded-2xl mb-3 border border-slate-700 hover:border-emerald-500/50 transition-all">
-              <div class="flex justify-between">
-                <span class="font-semibold">${cls}</span>
-                <span class="text-emerald-400">${CLASS_STUDENT_COUNT[cls] || 65} students</span>
-              </div>
-            </div>
-          `).join('') || '<p class="text-slate-400 text-center py-8">No classes assigned</p>'}
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function renderStudentDashboard() {
-  document.getElementById('dashContent').innerHTML = `
-    <div class="max-w-5xl mx-auto">
-      <h1 class="syne text-4xl font-bold mb-4">Welcome ${currentUser.name}!</h1>
-      <p class="text-2xl text-slate-300 mb-12">ID: ${currentUser.studentId} • Joined: ${formatJoinDate(currentUser.joinedAt)}</p>
-      
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div class="bg-[#111827]/80 p-10 rounded-3xl border border-white/10 text-center">
-          <i class="fas fa-graduation-cap text-6xl text-emerald-400 mb-6"></i>
-          <h3 class="text-2xl font-bold mb-4">B.Tech Computer Engineering</h3>
-          <p class="text-slate-400">CE-2A • 68 students</p>
-        </div>
-        <div class="bg-[#111827]/80 p-8 rounded-3xl border border-white/10">
-          <h3 class="text-2xl font-bold mb-6">Today's Classes</h3>
-          <div class="space-y-4">
-            <div class="p-6 bg-slate-800 rounded-2xl border border-slate-700">
-              <div class="flex justify-between mb-2"><strong>Algorithms</strong><span>2:00 PM</span></div>
-              <p class="text-sm text-slate-400">CS-201 • Dr. Ramesh Sharma</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function renderAdminDashboard() {
-  document.getElementById('dashContent').innerHTML = `
-    <div class="max-w-6xl mx-auto">
-      <h1 class="syne text-5xl font-bold mb-6">Admin Dashboard</h1>
-      <p class="text-2xl mb-2">${currentUser.name} (${currentUser.adminRole})</p>
-      <p class="text-lg text-slate-400">Member since ${formatJoinDate(currentUser.joinedAt)}</p>
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-        <div class="bg-gradient-to-b from-purple-500/20 p-8 rounded-3xl border border-purple-500/30 text-center">
-          <div class="text-4xl mb-4">👨‍🎓</div>
-          <h3 class="text-3xl font-bold">1,245</h3>
-          <p>Students</p>
-        </div>
-        <div class="bg-gradient-to-b from-emerald-500/20 p-8 rounded-3xl border border-emerald-500/30 text-center">
-          <div class="text-4xl mb-4">👨‍🏫</div>
-          <h3 class="text-3xl font-bold">87</h3>
-          <p>Faculty</p>
-        </div>
-        <div class="bg-gradient-to-b from-orange-500/20 p-8 rounded-3xl border border-orange-500/30 text-center">
-          <div class="text-4xl mb-4">📚</div>
-          <h3 class="text-3xl font-bold">45</h3>
-          <p>Courses</p>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-// ==================== FIXED LOGOUT ====================
-function doLogout() {
-  if (confirm(`Logout ${currentUser?.name || ''}?`)) {
-    currentUser = null;
-    document.getElementById('dashboard').classList.add('hidden');
-    document.getElementById('authPage').classList.remove('hidden');
-    
-    // Clear forms
-    document.querySelectorAll('.field').forEach(field => field.value = '');
-    document.getElementById('loginPass').type = 'password';
-    document.getElementById('eyeL').className = 'fas fa-eye';
-    
-    selectRole('student');
-    switchTab('login');
-    showToast('Logged out successfully!', 'success');
-  }
-}
-
-// Initialize
-selectRole('student');
-setMaxJoinDate();
-</script>
+    window.onload = showHome;
+  </script>
 </body>
 </html>
